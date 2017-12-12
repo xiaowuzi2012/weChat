@@ -2,6 +2,7 @@
 
 var Promise = require("bluebird");
 var request = Promise.promisify(require("request"));
+var util = require("./util");
 
 var prefix = "https://api.weixin.qq.com/cgi-bin/";
 var api = {
@@ -24,7 +25,7 @@ function WeChat(opts) {
 		}
 		//判断票据是否在有效期内
 		if(that.isValidAccessToken(data)) {
-			Promise.resolve(data);
+			return Promise.resolve(data);
 		} else {
 			return that.updateAccessToken();
 		}
@@ -67,6 +68,16 @@ WeChat.prototype.updateAccessToken = function() {
 			resolve(data);
 		})
 	})
+}
+
+WeChat.prototype.reply = function() {
+	var content = this.body;
+	var message = this.weixin;
+	var xml = util.tpl(content, message);
+
+	this.status = 200;
+	this.type = "application/xml";
+	this.body = xml;
 }
 
 module.exports = WeChat;

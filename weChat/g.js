@@ -5,9 +5,9 @@ var getRawBody = require("raw-body");
 var WeChat = require("./weChat");
 var util = require("./util");
 
-module.exports = function(opts) {
+module.exports = function(opts, handler) {
 	//在测试发送方式get/post时，可以先屏蔽掉
-	//	var weChat = new WeChat(opts);
+	var weChat = new WeChat(opts);
 	return function*(next) {
 		var that = this;
 		var token = opts.Token;
@@ -39,21 +39,9 @@ module.exports = function(opts) {
 				console.log(content);
 				var message = util.formatMessage(content.xml);
 				console.log(message);
-				if(message.MsgType === "event") {
-					if(message.Event === "subscribe") {
-						var now = new Date().getTime();
-						that.status = 200;
-						that.type = "application/xml";
-						that.body = "<xml>" +
-							"<ToUserName><![CDATA[" + message.FromUserName + "]]></ToUserName>" +
-							"<FromUserName><![CDATA[" + message.ToUserName + "]]></FromUserName>" +
-							"<CreateTime>" + now + "</CreateTime>" +
-							"<MsgType><![CDATA[text]]></MsgType>" +
-							"<Content><![CDATA[wujinghenpiaoliang]]></Content>" +
-							"</xml>";
-						return;
-					}
-				}
+				this.weixin = message;
+				yield handler.call(this, next);
+				weChat.reply.call(this);
 			}
 		}
 	}
