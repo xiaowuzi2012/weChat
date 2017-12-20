@@ -1,8 +1,12 @@
 "use strict"
 
+var config = require("./config");
+var WeChat = require("./weChat/weChat");
+var weChatApi = new WeChat(config.weChat);
+
 exports.reply = function*(next) {
 	var message = this.weixin;
-	console.log(message);
+//	console.log(message);
 	if(message.MsgType === "event") {
 		if(message.Event === "subscribe") {
 			if(message.EventKey) {
@@ -45,6 +49,43 @@ exports.reply = function*(next) {
 				//				url: "https://nodejs.org/"
 				//			}
 			];
+		}else if(content === "5") {
+			var data = yield weChatApi.uploadMaterial("image", __dirname + "/2.jpg");
+			reply = {
+				type: "image",
+				mediaId:data.media_id
+			};
+		}else if(content === "6") {
+			var data = yield weChatApi.uploadMaterial("video", __dirname + "/6.mp4");
+			reply = {
+				type: "video",
+				title:"回复视频内容",
+				description: "坚持下去",
+				mediaId:data.media_id
+			};
+		}else if(content === "7") {
+			var data = yield weChatApi.uploadMaterial("image", __dirname + "/2.jpg");
+			reply = {
+				type: "music",
+				title:"回复音乐内容",
+				musicUrl:"http://win.web.ri03.sycdn.kuwo.cn/d7b8d8c2e98798060e8ccccffd33e3d2/5a3a9fe9/resource/a2/38/36/3360258411.aac",
+				description: "坚持下去",
+				thumbMediaId:data.media_id
+			};
+		}else if(content === "8") {
+			var data = yield weChatApi.uploadMaterial("image", __dirname + "/2.jpg",{type:"image"});
+			reply = {
+				type: "image",
+				mediaId:data.media_id
+			};
+		}else if(content === "9") {
+			var data = yield weChatApi.uploadMaterial("video", __dirname + "/6.mp4",{type:"video",description:"{'title':'really a nice day','introduction':'坚持下去'}"});
+			reply = {
+				type: "video",
+				title:"回复视频内容",
+				description: "坚持下去",
+				mediaId:data.media_id
+			};
 		}
 		this.body = reply;
 	}

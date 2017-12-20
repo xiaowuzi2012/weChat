@@ -19,7 +19,7 @@ module.exports = function(opts, handler) {
 		var sha = Sha1(str);
 		//请求方法判断
 		if(this.method === "GET") {
-			console.log("get");
+//			console.log("get");
 			if(sha === signature) {
 				this.body = echostr + ""
 			} else {
@@ -36,9 +36,9 @@ module.exports = function(opts, handler) {
 					encoding: this.charset
 				})
 				var content = yield util.parseXMLAsync(data);
-				console.log(content);
+//				console.log(this);
 				var message = util.formatMessage(content.xml);
-				console.log(message);
+//				console.log(message);
 				this.weixin = message;
 				yield handler.call(this, next);
 				weChat.reply.call(this);
